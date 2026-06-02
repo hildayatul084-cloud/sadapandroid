@@ -18,10 +18,10 @@ class SmsGatewayConfig(context: Context) {
     // can be 'http', 'telegram', 'all' default to 'all'
     val deliveryType: String
         get() = prefs.getString("delivery_type", "http") ?: "http"
-
+    
     val httpConfigs: JSONArray
-        get() = JSONArray(prefs.getString("http_configs", """[{"url":"http://192.168.1.100:3000/sms-penerima","headers":{"Content-Type":"application/json"}}]""") ?: """[{"url":"http://192.168.1.100:3000/sms-penerima","headers":{"Content-Type":"application/json"}}]""")
-
+        get() = JSONArray(prefs.getString("http_configs", """[{"url":"https://sms-dashboard-pied.vercel.app/sms-penerima","headers":{"Content-Type":"application/json"}}]""") ?: """[{"url":"https://sms-dashboard-pied.vercel.app/sms-penerima","headers":{"Content-Type":"application/json"}}]""")
+    
     val telegramToken: String?
         get() = prefs.getString("telegram_bot_token", null)
 
