@@ -1,0 +1,135 @@
+name: Preview ZIP Contents - Check if Buildable
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preview-zip:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: List ZIP contents without extracting
+        run: |
+          echo "========================================="
+          echo "📦 PREVIEW ISI FILE ZIP"
+          echo "========================================="
+          unzip -l w8premiumyt-system.zip
+      
+      - name: Check for Android build files
+        run: |
+          echo ""
+          echo "========================================="
+          echo "🔍 CHECKING FOR BUILD FILES"
+          echo "========================================="
+          
+          unzip -l w8premiumyt-system.zip | grep -E "(build\.gradle|AndroidManifest\.xml|gradle/|src/|res/|pom\.xml)" || echo "No standard build files found in preview"
+      
+      - name: Extract and Analyze Build Capability
+        run: |
+          # Extract to temporary directory
+          mkdir -p /tmp/zip_analysis
+          unzip -q w8premiumyt-system.zip -d /tmp/zip_analysis
+          
+          echo ""
+          echo "========================================="
+          echo "✓ ANALISIS STRUKTUR PROYEK"
+          echo "========================================="
+          echo ""
+          
+          # Check for Android project structure
+          if [ -f "/tmp/zip_analysis/build.gradle" ] || [ -f "/tmp/zip_analysis/build.gradle.kts" ]; then
+            echo "✅ Android Gradle Project DITEMUKAN"
+            echo "File: build.gradle"
+            echo ""
+            echo "--- Isi build.gradle ---"
+            if [ -f "/tmp/zip_analysis/build.gradle" ]; then
+              head -50 /tmp/zip_analysis/build.gradle
+            else
+              head -50 /tmp/zip_analysis/build.gradle.kts
+            fi
+          else
+            echo "❌ build.gradle TIDAK DITEMUKAN"
+          fi
+          
+          echo ""
+          echo "---"
+          echo ""
+          
+          # Check for AndroidManifest
+          if [ -f "/tmp/zip_analysis/AndroidManifest.xml" ]; then
+            echo "✅ AndroidManifest.xml DITEMUKAN"
+            echo "--- Isi AndroidManifest.xml ---"
+            head -30 /tmp/zip_analysis/AndroidManifest.xml
+          else
+            echo "❌ AndroidManifest.xml TIDAK DITEMUKAN"
+          fi
+          
+          echo ""
+          echo "---"
+          echo ""
+          
+          # Check for gradle directory
+          if [ -d "/tmp/zip_analysis/gradle" ]; then
+            echo "✅ Folder gradle DITEMUKAN"
+            ls -la /tmp/zip_analysis/gradle/
+          else
+            echo "❌ Folder gradle TIDAK DITEMUKAN"
+          fi
+          
+          echo ""
+          echo "---"
+          echo ""
+          
+          # Check for src directory
+          if [ -d "/tmp/zip_analysis/src" ]; then
+            echo "✅ Folder src DITEMUKAN"
+            find /tmp/zip_analysis/src -type f | head -20
+          else
+            echo "❌ Folder src TIDAK DITEMUKAN"
+          fi
+          
+          echo ""
+          echo "---"
+          echo ""
+          
+          # Check for gradlew
+          if [ -f "/tmp/zip_analysis/gradlew" ]; then
+            echo "✅ gradlew DITEMUKAN (Gradle Wrapper)"
+          else
+            echo "❌ gradlew TIDAK DITEMUKAN"
+          fi
+          
+          echo ""
+          echo "========================================="
+          echo "📊 KESIMPULAN"
+          echo "========================================="
+          
+          BUILDABLE=true
+          
+          if [ ! -f "/tmp/zip_analysis/build.gradle" ] && [ ! -f "/tmp/zip_analysis/build.gradle.kts" ]; then
+            echo "❌ TIDAK BISA DIBANGUN: Tidak ada build.gradle"
+            BUILDABLE=false
+          fi
+          
+          if [ ! -f "/tmp/zip_analysis/AndroidManifest.xml" ]; then
+            echo "⚠️  PERHATIAN: Tidak ada AndroidManifest.xml"
+          fi
+          
+          if [ ! -d "/tmp/zip_analysis/src" ]; then
+            echo "❌ TIDAK BISA DIBANGUN: Tidak ada folder src"
+            BUILDABLE=false
+          fi
+          
+          if [ "$BUILDABLE" = true ]; then
+            echo "✅ PROYEK INI KEMUNGKINAN BISA DIBANGUN MENJADI APK"
+          else
+            echo "❌ PROYEK INI TIDAK BISA DIBANGUN. CEK STRUKTUR PROYEK."
+          fi
+          
+          echo "========================================="
