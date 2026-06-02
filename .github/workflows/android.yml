@@ -1,4 +1,4 @@
-name: Build Android APK Subfolder Fix
+name: Build Android APK Auto Path
 
 on:
   push:
@@ -19,16 +19,19 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # Di sini kita arahkan robot untuk masuk ke react-native-sms-gateway/android
+      # Robot akan mencari otomatis di mana folder yang berisi file gradlew
       - name: Build APK Debug
         run: |
-          cd react-native-sms-gateway/android
+          GRADLEW_PATH=$(find . -name gradlew -print -quit)
+          GRADLEW_DIR=$(dirname "$GRADLEW_PATH")
+          echo "File gradlew ditemukan di folder: $GRADLEW_DIR"
+          cd "$GRADLEW_DIR"
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      # Jalur pengambilan file APK juga disesuaikan dengan folder utamanya
+      # Robot akan mencari otomatis di mana hasil file APK-nya berada
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Aplikasi-Android-Kamu
-          path: react-native-sms-gateway/android/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/build/outputs/apk/debug/app-debug.apk"
