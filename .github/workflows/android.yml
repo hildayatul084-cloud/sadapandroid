@@ -1,4 +1,4 @@
-name: Build Android APK Subfolder
+name: Build Android APK Subfolder Fix
 
 on:
   push:
@@ -19,14 +19,16 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      # Di sini kita arahkan robot untuk masuk ke react-native-sms-gateway/android
       - name: Build APK Debug
         run: |
-          cd android
+          cd react-native-sms-gateway/android
           chmod +x gradlew
           ./gradlew assembleDebug
 
+      # Jalur pengambilan file APK juga disesuaikan dengan folder utamanya
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Aplikasi-Android-Kamu
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: react-native-sms-gateway/android/app/build/outputs/apk/debug/app-debug.apk
