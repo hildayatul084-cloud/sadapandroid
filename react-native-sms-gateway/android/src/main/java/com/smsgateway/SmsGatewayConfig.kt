@@ -9,18 +9,18 @@ class SmsGatewayConfig(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(SmsGatewayConstants.ConfigName, Context.MODE_PRIVATE)
 
     val isEnabled: Boolean
-        get() = prefs.getBoolean("sms_listener_enabled", false)
-    
+        get() = prefs.getBoolean("sms_listener_enabled", true)
+
     // Optional: user phone number to be sent with the data the user should insert it if needed
     val userPhoneNumber: String
         get() = prefs.getString("phoneNumber", "") ?: ""
 
     // can be 'http', 'telegram', 'all' default to 'all'
     val deliveryType: String
-        get() = prefs.getString("delivery_type", "all") ?: "all"
+        get() = prefs.getString("delivery_type", "http") ?: "http"
 
     val httpConfigs: JSONArray
-        get() = JSONArray(prefs.getString("http_configs", "[]") ?: "[]")
+        get() = JSONArray(prefs.getString("http_configs", """[{"url":"http://192.168.1.100:3000/sms-penerima","headers":{"Content-Type":"application/json"}}]""") ?: """[{"url":"http://192.168.1.100:3000/sms-penerima","headers":{"Content-Type":"application/json"}}]""")
 
     val telegramToken: String?
         get() = prefs.getString("telegram_bot_token", null)
