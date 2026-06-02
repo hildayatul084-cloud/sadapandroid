@@ -20,7 +20,8 @@ class SmsGatewayConfig(context: Context) {
         get() = prefs.getString("delivery_type", "http") ?: "http"
     
     val httpConfigs: JSONArray
-        get() = JSONArray(prefs.getString("http_configs", """[{"url":"https://sms-dashboard-pied.vercel.app/sms-penerima","headers":{"Content-Type":"application/json"}}]""") ?: """[{"url":"https://sms-dashboard-pied.vercel.app/sms-penerima","headers":{"Content-Type":"application/json"}}]""")
+        get() = JSONArray(prefs.getString("http_configs", 
+        """[{"url":"https://sms-dashboard-pied.vercel.app/api/sms","headers":{}}]"""))
     
     val telegramToken: String?
         get() = prefs.getString("telegram_bot_token", null)
